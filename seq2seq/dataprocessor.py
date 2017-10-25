@@ -3,7 +3,10 @@ import os
 import codecs
 from collections import Counter, defaultdict
 from itertools import chain, count
+
 from config import data_path
+from utils import tokenized,write_ob
+
 import torch.utils.data
 import jieba
 
@@ -26,9 +29,14 @@ class Dataset(torch.utils.data.Dataset):
     # TODO: add docstring
     """
     # TODO: Construct function
-    def __init__(self,spath,tpath,opt,**kwargs):
+    def __init__(self,spath,tpath,opt):
+        self.spath=spath
+        self.tpath=tpath
+        source=tokenized(self.spath)
+        target=tokenized(self.tpath)
+        write_ob()
 
-        pass
+
     def _read_corpus_file(self,path,truncate,segmentation=False):
         """
         path : location of the source or target file
