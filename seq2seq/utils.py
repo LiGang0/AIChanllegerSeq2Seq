@@ -6,6 +6,10 @@ import nltk
 import codecs
 
 
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 def _preprocess_sgm(line, is_sgm):
     """Preprocessing to strip tags in SGM files."""
     if not is_sgm:
@@ -49,6 +53,9 @@ def tokenized(filepath):
         for index,line in enumerate(f):
             _tokenized = tokenize(line, flag_sgm, flag_zh, flag_lowwer, ' ')
             tokenized+="%s\n" % _tokenized
+            if index % 2000 == 0:
+                _tokenizer_name = "jieba" if is_zh else "nltk.word_tokenize"
+                logger.info("     [%d] %s: %s" % (i, _tokenizer_name, line))
     return tokenized
 
 def write_ob(filename,ob):
