@@ -1,2 +1,3 @@
 data/*
 seq2seq/*.pyc
+examples/*
