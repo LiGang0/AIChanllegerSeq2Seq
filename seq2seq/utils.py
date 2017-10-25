@@ -54,8 +54,8 @@ def tokenized(filepath):
             _tokenized = tokenize(line, flag_sgm, flag_zh, flag_lowwer, ' ')
             tokenized+="%s\n" % _tokenized
             if index % 2000 == 0:
-                _tokenizer_name = "jieba" if is_zh else "nltk.word_tokenize"
-                logger.info("     [%d] %s: %s" % (i, _tokenizer_name, line))
+                _tokenizer_name = "jieba" if flag_zh else "nltk.word_tokenize"
+                logger.info("     [%d] %s: %s" % (index, _tokenizer_name, line))
     return tokenized
 
 def write_ob(filename,ob):
