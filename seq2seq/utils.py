@@ -1,6 +1,9 @@
+#-*- coding: UTF-8 -*-
+
 from __future__ import print_function
 import jieba
 import nltk
+import codecs
 
 
 def _preprocess_sgm(line, is_sgm):
@@ -27,7 +30,7 @@ def tokenize(line, is_sgm=False, is_zh=False, lower_case=True, delim=' '):
     # strip sgm tags if any
     _line = _preprocess_sgm(line, is_sgm)
     # replace non-breaking whitespace
-    _line = _line.replace("\xa0", " ").strip()
+    _line = _line.replace(u"\xa0", " ").strip()
     # tokenize
     _tok = jieba.cut(_line.rstrip('\r\n')) if is_zh else nltk.word_tokenize(
         _line)
@@ -42,9 +45,8 @@ def tokenized(filepath):
     flag_sgm = filepath.endswith('.sgm')
     flag_zh  = filepath.endswith('.zh') or filepath.endswith('.zh.sgm')
     flag_lowwer = not flag_zh
-    with open(filepath,'rb') as f:
+    with codecs.open(filepath,'rb',encoding='utf-8') as f:
         for index,line in enumerate(f):
-            line=line.decode('utf-8')
             _tokenized = tokenize(line, flag_sgm, flag_zh, flag_lowwer, ' ')
             tokenized+="%s\n" % _tokenized
     return tokenized

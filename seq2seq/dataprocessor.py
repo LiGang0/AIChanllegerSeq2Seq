@@ -53,5 +53,5 @@ class Dataset(torch.utils.data.Dataset):
 if __name__ == '__main__':
     dataset=Dataset(spath=os.path.abspath(os.path.join(data_path,"train.en")),
                     tpath=os.path.abspath(os.path.join(data_path,"train.zh")))
-    print dataset.source
+    print dataset.source[0]
 
