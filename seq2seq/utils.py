@@ -6,6 +6,12 @@ import nltk
 import codecs
 
 
+
+
+
+
+
+
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -61,4 +67,7 @@ def tokenized(filepath):
 def write_ob(filename,ob):
     with open(filename,'r') as f:
         f.write(ob)
+def tokenizedAndSave(filename,savepath):
+    data=tokenized(filename)
+    write_ob(data,savepath)
     
