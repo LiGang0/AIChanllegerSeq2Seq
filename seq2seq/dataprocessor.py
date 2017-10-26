@@ -2,8 +2,8 @@
 import os
 
 
-from config import data_path
-from utils import tokenizedAndSave
+from config import data_path,USE_CUDA
+from utils import tokenizedAndSave,readLanguages
 
 import torch.utils.data
 
@@ -15,20 +15,7 @@ import torch.nn as nn
 from torch.autograd import Variable
 from torch import optim
 
-SOS_token = 0
-EOS_token = 1
 
-def indexesFromSentence(lang, sentence):
-    return [lang.word2index[word] for word in sentence.split(' ')]
-
-def variableFromSentence(lang, sentence, config):
-    indexes = indexesFromSentence(lang, sentence)
-    indexes.append(EOS_token)
-    result = Variable(torch.LongTensor(indexes).view(-1, 1))
-    if config.use_cuda:
-        return result.cuda()
-    else:
-        return result
 
 
 
@@ -49,40 +36,39 @@ class Dataset(torch.utils.data.Dataset):
             tmpdir=os.path.abspath(os.path.join(data_path,'tokenized'))
         if not os.path.exists(tmpdir):
             os.makedirs(tmpdir)
-        newspath=os.path.exists(os.path.abspath(os.path.join(tmpdir,os.path.split(
-                self.spath)[1])))
-        newtpath=os.path.exists(os.path.abspath(os.path.join(tmpdir,os.path.split(
-                self.tpath)[1])))
-        if not newspath:
+        newspath=os.path.abspath(os.path.join(tmpdir,os.path.split(
+                self.spath)[1]))
+        newtpath=os.path.abspath(os.path.join(tmpdir,os.path.split(
+                self.tpath)[1]))
+        if not os.path.exists(newspath):
+            print("Tokenize the files {}, saved in {}".format(self.spath,newspath))
             tokenizedAndSave(self.spath,newspath)
-        if not newtpath:
+        else:
+            print("Tokenized file exist")
+
+        if not os.path.exists(newtpath):
+            print("Tokenize the files {}, saved in {}".format(self.tpath, newtpath))
             tokenizedAndSave(self.tpath,newtpath)
+        else:
+            print("Tokenized file exist")
+        self.spath=newspath
+        self.tpath=newtpath
+
+        self.source,self.target,self.pairs=readLanguages(self.spath,self.tpath)
 
 
-
-
-
-        # TODO maybe save the file
-        #
-        #
-
-
-
-
-    # TODO: get item function
     def __getitem__(self,i):
-        pass
+        return self.pairs
     
-    # TODO: get length of the dataset
-    def __len__(self):
-        pass
 
-    # TODO: iterator
+    def __len__(self):
+        return len(self.pairs)
+
+
     def __iter__(self):
-        pass
-    # TODO: get attr
-    def __getattr__(self,attr):
-        pass
+        return [pair for pair in self.pairs]
+
+
     # TODO: get_batch
     def get_batch(self,batch_size):
         pass

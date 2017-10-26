@@ -4,17 +4,58 @@ from __future__ import print_function
 import jieba
 import nltk
 import codecs
-
-
-
-
-
-
-
+import re
+import unicodedata
 
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+SOS_token = 0
+EOS_token = 1
+
+class Lang:
+    def __init__(self, name):
+        if not name:
+            name="Unknown"
+        self.name = name
+        self.word2index = {}
+        self.word2count = {}
+        self.index2word = {0: "SOS", 1: "EOS"}
+        self.n_words = 2 # Count SOS and EOS
+
+    def addSentence(self, sentence):
+        for word in sentence.split(' '):
+            self.addWord(word)
+
+    def addWord(self, word):
+        if word not in self.word2index:
+            self.word2index[word] = self.n_words
+            self.word2count[word] = 1
+            self.index2word[self.n_words] = word
+            self.n_words += 1
+        else:
+            self.word2count[word] += 1
+    def getIndex(self,sentence):
+        return [self.word2count(word) for word in sentence.split(' ')]
+
+
+
+def normalizeString(s):
+    s = unicodeToAscii(s.lower().strip())
+    s = re.sub(r"([.!?])", r" \1", s)
+    s = re.sub(r"[^a-zA-Z.!?]+", r" ", s)
+    return s
+
+def unicodeToAscii(s):
+    return ''.join(
+        c for c in unicodedata.normalize('NFD',unicode(s,'utf-8'))
+        if unicodedata.category(c) != 'Mn'
+    )
+
+
+
 
 def _preprocess_sgm(line, is_sgm):
     """Preprocessing to strip tags in SGM files."""
@@ -70,4 +111,32 @@ def write_ob(filename,ob):
 def tokenizedAndSave(filename,savepath):
     data=tokenized(filename)
     write_ob(savepath,data)
-    
+
+
+def readLanguages(lang1,lang2):
+    source_lang=Lang(name="source")
+    target_lang=Lang(name="target")
+    pairs=[]
+    with codecs.open(lang1,
+                     'rb',
+                     encoding='utf-8') as f1,codecs.open(lang2,
+                                                         'rb',
+                                                         encoding='utf-8') as f2:
+        line1=f1.readline().strip()
+        line2=f2.readline().strip()
+
+        pair =[normalizeString(line1),normalizeString(line2)]
+
+        source_lang.addSentence(pair[0])
+        target_lang.addSentence(pair[1])
+        pairs.append(pair)
+
+    print("Read {} sentence pairs".format(len(pairs)))
+    return source_lang,target_lang,pairs
+
+
+
+
+
+
+
