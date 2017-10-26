@@ -69,5 +69,5 @@ def write_ob(filename,ob):
         f.write(ob)
 def tokenizedAndSave(filename,savepath):
     data=tokenized(filename)
-    write_ob(data,savepath)
+    write_ob(savepath,data)
     
