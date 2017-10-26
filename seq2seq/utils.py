@@ -6,6 +6,7 @@ import nltk
 import codecs
 import re
 import unicodedata
+import os
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -50,8 +51,8 @@ def normalizeString(s):
 
 def unicodeToAscii(s):
     return ''.join(
-        c for c in unicodedata.normalize('NFD',unicode(s,'utf-8'))
-        if unicodedata.category(c) != 'Mn'
+        c for c in unicodedata.normalize(u'NFD',unicode(s,'utf-8'))
+        if unicodedata.category(c) != u'Mn'
     )
 
 
@@ -105,9 +106,11 @@ def tokenized(filepath):
                 logger.info("     [%d] %s: %s" % (index, _tokenizer_name, line))
     return tokenized
 
-def write_ob(filename,ob):
-    with open(filename,'w') as f:
-        f.write(ob)
+def write_ob(filename,s):
+    with codecs.open(filename,'w',encoding='utf-8') as f:
+        f.write(s)
+
+
 def tokenizedAndSave(filename,savepath):
     data=tokenized(filename)
     write_ob(savepath,data)

@@ -2,7 +2,7 @@
 import os
 
 
-from config import data_path,USE_CUDA,demo_path
+from config import DemoConfig,ReleaseConfig,USE_CUDA
 from utils import tokenizedAndSave,readLanguages
 
 import torch.utils.data
@@ -27,9 +27,10 @@ class Dataset(torch.utils.data.Dataset):
 
     """
     # TODO: Construct function
-    def __init__(self,spath,tpath,tmpdir=None,opt=None):
-        self.spath=spath
-        self.tpath=tpath
+    def __init__(self,config=DemoConfig,tmpdir=None,opt=None):
+        self.spath=config.sourcepath
+        self.tpath=config.targetpath
+        self.config=config
         datapath =os.path.split(self.spath)[0]
         # TODO: save the tokenized file
         if not tmpdir:
@@ -78,7 +79,7 @@ class Dataset(torch.utils.data.Dataset):
 
 
 if __name__ == '__main__':
-    dataset=Dataset(spath=os.path.abspath(os.path.join(demo_path,"train.en")),
-                    tpath=os.path.abspath(os.path.join(demo_path,"train.zh")))
+
+    dataset=Dataset()
 
 
