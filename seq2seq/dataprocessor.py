@@ -49,10 +49,14 @@ class Dataset(torch.utils.data.Dataset):
             tmpdir=os.path.abspath(os.path.join(data_path,'tokenized'))
         if not os.path.exists(tmpdir):
             os.makedirs(tmpdir)
-        if not os.path.exists(os.path.abspath(os.path.join(tmpdir,self.spath))):
-            tokenizedAndSave(self.spath,os.path.abspath(os.path.join(tmpdir,self.spath)))
-        if not os.path.exists(os.path.abspath(os.path.join(tmpdir, self.tpath))):
-            tokenizedAndSave(self.tpath, os.path.abspath(os.path.join(tmpdir, self.tpath)))
+        newspath=os.path.exists(os.path.abspath(os.path.join(tmpdir,os.path.split(
+                self.spath)[1])))
+        newtpath=os.path.exists(os.path.abspath(os.path.join(tmpdir,os.path.split(
+                self.tpath)[1])))
+        if not newspath:
+            tokenizedAndSave(self.spath,newspath)
+        if not newtpath:
+            tokenizedAndSave(self.tpath,newtpath)
 
 
 
