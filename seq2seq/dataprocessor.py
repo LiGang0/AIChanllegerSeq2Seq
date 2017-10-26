@@ -2,7 +2,7 @@
 import os
 
 
-from config import data_path,USE_CUDA
+from config import data_path,USE_CUDA,demo_path
 from utils import tokenizedAndSave,readLanguages
 
 import torch.utils.data
@@ -30,10 +30,10 @@ class Dataset(torch.utils.data.Dataset):
     def __init__(self,spath,tpath,tmpdir=None,opt=None):
         self.spath=spath
         self.tpath=tpath
-
+        datapath =os.path.split(self.spath)[0]
         # TODO: save the tokenized file
         if not tmpdir:
-            tmpdir=os.path.abspath(os.path.join(data_path,'tokenized'))
+            tmpdir=os.path.abspath(os.path.join(datapath,'tokenized'))
         if not os.path.exists(tmpdir):
             os.makedirs(tmpdir)
         newspath=os.path.abspath(os.path.join(tmpdir,os.path.split(
@@ -78,7 +78,7 @@ class Dataset(torch.utils.data.Dataset):
 
 
 if __name__ == '__main__':
-    dataset=Dataset(spath=os.path.abspath(os.path.join(data_path,"train.en")),
-                    tpath=os.path.abspath(os.path.join(data_path,"train.zh")))
+    dataset=Dataset(spath=os.path.abspath(os.path.join(demo_path,"train.en")),
+                    tpath=os.path.abspath(os.path.join(demo_path,"train.zh")))
 
 

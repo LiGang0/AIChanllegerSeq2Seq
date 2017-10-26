@@ -106,7 +106,7 @@ def tokenized(filepath):
     return tokenized
 
 def write_ob(filename,ob):
-    with open(filename,'r') as f:
+    with open(filename,'w') as f:
         f.write(ob)
 def tokenizedAndSave(filename,savepath):
     data=tokenized(filename)
