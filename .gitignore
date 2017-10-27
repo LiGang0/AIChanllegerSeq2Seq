@@ -3,3 +3,5 @@ seq2seq/*.pyc
 examples/*
 seq2seq/*.ipynb
 nohub.out
+.idea/*
+.DS_Store
