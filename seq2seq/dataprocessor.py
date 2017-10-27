@@ -28,6 +28,12 @@ class Dataset(torch.utils.data.Dataset):
     """
     # TODO: Construct function
     def __init__(self,config=DemoConfig,tmpdir=None,opt=None):
+        """
+
+        :param config:
+        :param tmpdir:
+        :param opt:
+        """
         self.spath=config.sourcepath
         self.tpath=config.targetpath
         self.config=config
