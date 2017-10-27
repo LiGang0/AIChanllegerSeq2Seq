@@ -2,7 +2,7 @@
 import os
 
 
-from config import DemoConfig,ReleaseConfig,USE_CUDA,EOS_token
+from config import DemoConfig,USE_CUDA,EOS_token
 from utils import tokenizedAndSave,readLanguages
 
 import torch.utils.data
