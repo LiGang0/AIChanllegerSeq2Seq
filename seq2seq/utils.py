@@ -51,7 +51,7 @@ def normalizeString(s):
 
 def unicodeToAscii(s):
     return ''.join(
-        c for c in unicodedata.normalize(u'NFD',unicode(s,'utf-8'))
+        c for c in unicodedata.normalize(u'NFD',unicode(s))
         if unicodedata.category(c) != u'Mn'
     )
 
@@ -95,7 +95,7 @@ def tokenize(line, is_sgm=False, is_zh=False, lower_case=True, delim=' '):
 def tokenized(filepath):
     tokenized = ''
     flag_sgm = filepath.endswith('.sgm')
-    flag_zh  = filepath.endswith('.zh') or filepath.endswith('.zh.sgm')
+    flag_zh  = filepath.endswith('.zh') or filepath.endswith('.zh.sgm') or filepath.endswith('.zh.rate')
     flag_lowwer = not flag_zh
     with codecs.open(filepath,'rb',encoding='utf-8') as f:
         for index,line in enumerate(f):
@@ -125,14 +125,18 @@ def readLanguages(lang1,lang2):
                      encoding='utf-8') as f1,codecs.open(lang2,
                                                          'rb',
                                                          encoding='utf-8') as f2:
-        line1=f1.readline().strip()
-        line2=f2.readline().strip()
+        lines1=f1.readlines()
+        lines2=f2.readlines()
+        lines1=[line.strip() for line in lines1]
+        lines2=[line.strip() for line in lines2]
+        assert (len(lines1)==len(lines2))
+        for line1,line2 in zip(lines1,lines2):
+            #TODO: hint not normalizing
+            pair =[line1,line2]
 
-        pair =[normalizeString(line1),normalizeString(line2)]
-
-        source_lang.addSentence(pair[0])
-        target_lang.addSentence(pair[1])
-        pairs.append(pair)
+            source_lang.addSentence(pair[0])
+            target_lang.addSentence(pair[1])
+            pairs.append(pair)
 
     print("Read {} sentence pairs".format(len(pairs)))
     return source_lang,target_lang,pairs

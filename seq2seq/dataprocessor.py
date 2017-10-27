@@ -2,7 +2,7 @@
 import os
 
 
-from config import DemoConfig,ReleaseConfig,USE_CUDA
+from config import DemoConfig,ReleaseConfig,USE_CUDA,EOS_token
 from utils import tokenizedAndSave,readLanguages
 
 import torch.utils.data
@@ -69,10 +69,31 @@ class Dataset(torch.utils.data.Dataset):
     def __iter__(self):
         return [pair for pair in self.pairs]
 
+    def getindex(self,sample):
+        [s1,s2]=sample
+        return [[self.source.word2index[item] for item in s1.split(' ')]+[EOS_token],
+                [self.target.word2index[item] for item in s2.split(' ')]+[EOS_token]]
 
-    # TODO: get_batch
-    def get_batch(self,batch_size):
+    def get_sample(self):
+        sample=random.choice(self.pairs)
+        return sample
+    def get_index_sample(self):
+        sample=self.get_sample()
+        return self.getindex(sample)
+    def get_sample_var(self):
+        index_sample=self.get_index_sample()
+        [input_index,output_index]=index_sample
+        input_var=Variable(torch.LongTensor(input_index).view(-1,1))
+        output_var=Variable(torch.LongTensor(output_index).view(-1,1))
+        return [input_var,output_var]
+    def get_batch(self):
+        #TODO:
         pass
+
+
+
+
+
 
 
 
