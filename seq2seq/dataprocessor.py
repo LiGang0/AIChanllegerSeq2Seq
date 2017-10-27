@@ -86,9 +86,15 @@ class Dataset(torch.utils.data.Dataset):
         input_var=Variable(torch.LongTensor(input_index).view(-1,1))
         output_var=Variable(torch.LongTensor(output_index).view(-1,1))
         return [input_var,output_var]
-    def get_batch(self):
+    def get_batch(self,batchsize):
         #TODO:
-        pass
+        batch_input_var=[]
+        batch_output_var=[]
+        for i in range(batchsize):
+            batch_input_var.append(self.get_index_sample)
+            batch_output_var.append(self.get_index_sample)
+        return batch_input_var,batch_output_var
+
 
 
 
