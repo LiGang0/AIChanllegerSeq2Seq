@@ -1,13 +1,15 @@
+import random
+
 import torch
-from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
-import random
-from seq2seq.config import USE_CUDA
+from torch.autograd import Variable
 
 from seq2seq.config import EOS_token,SOS_token
-
-
+from seq2seq.config import USE_CUDA
+from seq2seq.config import ReleaseConfig
+from seq2seq.config import DemoConfig
+from seq2seq.dataprocessor import Dataset
 
 
 class EncoderRNN(nn.Module):
@@ -30,7 +32,7 @@ class EncoderRNN(nn.Module):
         return output, hidden
 
     def init_hidden(self):
-        hidden = Variable(torch.zeros(self.n_layers, 1, self.hidden_size))
+        hidden = Variable(torch.zeros(self.n_layers, 1, self.hidden_dim))
         if USE_CUDA: hidden = hidden.cuda()
         return hidden
 
@@ -124,6 +126,75 @@ class AttnDecoderRNN(nn.Module):
 
         # Return final output, hidden state, and attention weights (for visualization)
         return output, context, hidden, attn_weights
+
+
+
+class Train(object):
+    """
+
+    """
+    #TODO : need to change, with no dataset in the train class, a apply method should be
+    #TODO : in this class, which accept a dataset parameters and train the dataset .
+
+    def __init__(self,config):
+        self.n_epochs=config.n_epochs
+        self.dataset=Dataset(config=config)
+        self.encoder=EncoderRNN(n_dict=self.dataset.source.n_words,config=config)
+        self.decoder=AttnDecoderRNN(n_dict=self.dataset.target.n_words,config=config)
+        self.encoder_optimizer=config.optimizier(self.encoder.parameters(),lr=config.learning_rate)
+        self.decoder_optimizer=config.optimizier(self.decoder.parameters(),lr=config.learning_rate)
+        self.criterion = nn.NLLLoss()
+
+    def train(self):
+        for epoch in range(self.n_epochs):
+            loss=self.step()
+            print("At Epoch : {:5},Get loss : {:10}\n".format(epoch,loss))
+
+    def step(self):
+        self.encoder_optimizer.zero_grad()
+        self.decoder_optimizer.zero_grad()
+        training_pair=self.dataset.get_sample_var()
+        input_variable = training_pair[0]
+        target_variable = training_pair[1]
+
+        loss=0
+        input_length=input_variable.size()[0]
+        target_length=target_variable.size()[0]
+
+        encoder_hidden=self.encoder.init_hidden()
+        encoder_outputs,encoder_hidden=self.encoder(input_variable,encoder_hidden)
+        decoder_input=Variable(torch.LongTensor([[SOS_token]]))
+        decoder_context = Variable(torch.zeros(1, self.decoder.hidden_dim))
+        decoder_hidden = encoder_hidden
+
+        for di in range(target_length):
+            decoder_output, \
+            decoder_context, \
+            decoder_hidden, \
+            decoder_attention = self.decoder(decoder_input,
+                                             decoder_context,
+                                             decoder_hidden,
+                                             encoder_outputs)
+            loss += self.criterion(decoder_output[0], target_variable[di])
+            topv, topi = decoder_output.data.topk(1)
+            ni = topi[0][0]
+            decoder_input = Variable(torch.LongTensor([[ni]]))
+            if ni == EOS_token: break
+        loss.backward()
+        # TODO : clip value
+
+        self.encoder_optimizer.step()
+        self.decoder_optimizer.step()
+
+        return loss.data[0] / target_length
+
+
+
+
+
+
+
+        pass
 
 
 def train(input_variable, target_variable, encoder, decoder, encoder_optimizer, decoder_optimizer, criterion,
