@@ -1,6 +1,10 @@
 import sys
 import os
 import os.path
+
+import torch
+from torch import optim
+
 SOS_token=0
 EOS_token=1
 
@@ -11,6 +15,13 @@ demo_path=os.path.abspath(os.path.join(data_path,"demo"))
 USE_CUDA=False
 
 MODE=['release','demo']
+optimizier_dict={
+    'adam'   : torch.optim.Adam,
+    'sgd'    : torch.optim.SGD,
+    'adagrad': torch.optim.Adagrad,
+    'rmsprop': torch.optim.RMSprop,
+    'rprop'  : torch.optim.Rprop,
+}
 
 class Config(object):
     def __init__(self,
@@ -24,6 +35,8 @@ class Config(object):
                  attn_model='dot',
                  dropout_p=0.1,
                  max_length=10,
+                 optimizer='adam',
+                 learning_rate=0.0001,
                  mode='demo'):
         """
         :param batchsize:
@@ -41,6 +54,8 @@ class Config(object):
         self.n_output_layers=n_output_layers
         self.dropout_p=dropout_p
         self.max_length=max_length
+        self.optimizier=optimizier_dict[optimizer]
+        self.learning_rate=learning_rate
         if self.mode not in MODE:
             raise Exception("{} is not correct".format(self.mode))
         if self.mode==MODE[0]:
@@ -58,7 +73,7 @@ class Config(object):
 
 DemoConfig    = Config(batch_size=10,n_epochs=1000,hidden_dim=1000)
 
-# ReleaseConfig = Config(batch_size=10,n_epochs=1000,mode='release')
+ReleaseConfig = Config(batch_size=10,n_epochs=1000,hidden_dim=1000,mode='release')
 
 if __name__ == '__main__':
     print root_path
