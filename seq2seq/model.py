@@ -5,11 +5,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-from seq2seq.config import EOS_token,SOS_token
-from seq2seq.config import USE_CUDA
-from seq2seq.config import ReleaseConfig
-from seq2seq.config import DemoConfig
-from seq2seq.dataprocessor import Dataset
+
+from config import EOS_token,SOS_token
+from config import USE_CUDA
+from config import ReleaseConfig
+from config import DemoConfig
+from dataprocessor import Dataset
+
 
 
 class EncoderRNN(nn.Module):

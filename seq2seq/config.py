@@ -76,5 +76,5 @@ DemoConfig    = Config(batch_size=10,n_epochs=1000,hidden_dim=1000)
 ReleaseConfig = Config(batch_size=10,n_epochs=1000,hidden_dim=1000,mode='release')
 
 if __name__ == '__main__':
-    print root_path
-    print data_path
+    pass
+

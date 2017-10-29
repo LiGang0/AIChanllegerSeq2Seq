@@ -1,24 +1,19 @@
-
-from config import DemoConfig,ReleaseConfig
-from model.model1 import EncoderRNN,AttnDecoderRNN,Train
-from dataprocessor import Dataset
-
 import argparse
 
-
-
+from config import DemoConfig,ReleaseConfig
+from model import Train
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-m","--mode",help= "Chose a mode")
+    parser.add_argument("-m","--mode",help= "Chose a mode",default="demo")
     args=parser.parse_args()
 
     if args.mode=='release':
-        config=ReleaseConfig
+        Myconfig=ReleaseConfig
     elif args.mode=='demo':
-        config=DemoConfig
-    experiment=Train(config=config)
+        Myconfig=DemoConfig
+    experiment=Train(config=Myconfig)
     experiment.train()
 
 
