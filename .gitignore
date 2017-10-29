@@ -1,5 +1,6 @@
 data/*
 seq2seq/*.pyc
+seq2seq/model/*.pyc
 seq2seq/*.ipynb
 nohub.out
 .idea/*
