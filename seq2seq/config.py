@@ -1,18 +1,13 @@
-import sys
 import os
 import os.path
 
 import torch
-from torch import optim
 
-SOS_token=0
-EOS_token=1
+
 
 root_path=os.path.abspath(os.path.join(os.path.split(os.path.realpath(__file__))[0],"../"))
 data_path=os.path.abspath(os.path.join(root_path,"data"))
 demo_path=os.path.abspath(os.path.join(data_path,"demo"))
-
-USE_CUDA=False
 
 MODE=['release','demo']
 optimizier_dict={
@@ -45,6 +40,8 @@ class Config(object):
         :param n_epochs:
         :param mode:
         """
+        self.SOS_token=0
+        self.EOS_token=1
         self.batch_size=batch_size
         self.n_epochs=n_epochs
         self.mode=mode
@@ -60,6 +57,7 @@ class Config(object):
         self.learning_rate=learning_rate
         self.is_plot = is_plot
         self.clip_value=clip_value
+        self.USE_CUDA=torch.cuda.is_available()
         if self.mode not in MODE:
             raise Exception("{} is not correct".format(self.mode))
         if self.mode==MODE[0]:

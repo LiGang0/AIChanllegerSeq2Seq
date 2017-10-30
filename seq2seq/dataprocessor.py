@@ -1,24 +1,12 @@
-
 import os
-
-
-from config import DemoConfig,USE_CUDA,EOS_token
-from utils import tokenizedAndSave,readLanguages
-
-import torch.utils.data
-
-
 import random
-import time
+
 import torch
-import torch.nn as nn
+import torch.utils.data
 from torch.autograd import Variable
-from torch import optim
 
-
-
-
-
+from config import DemoConfig
+from utils import tokenizedAndSave,readLanguages
 
 
 class Dataset(torch.utils.data.Dataset):
@@ -37,6 +25,7 @@ class Dataset(torch.utils.data.Dataset):
         self.spath=config.sourcepath
         self.tpath=config.targetpath
         self.config=config
+        self.USE_CUDA=config.USE_CUDA
         datapath =os.path.split(self.spath)[0]
         # TODO: save the tokenized file
         if not tmpdir:
@@ -77,8 +66,8 @@ class Dataset(torch.utils.data.Dataset):
 
     def getindex(self,sample):
         [s1,s2]=sample
-        return [[self.source.word2index[item] for item in s1.split(' ')]+[EOS_token],
-                [self.target.word2index[item] for item in s2.split(' ')]+[EOS_token]]
+        return [[self.source.word2index[item] for item in s1.split(' ')]+[self.config.EOS_token],
+                [self.target.word2index[item] for item in s2.split(' ')]+[self.config.EOS_token]]
 
     def get_sample(self):
         sample=random.choice(self.pairs)
@@ -99,6 +88,9 @@ class Dataset(torch.utils.data.Dataset):
         for i in range(batchsize):
             batch_input_var.append(self.get_index_sample)
             batch_output_var.append(self.get_index_sample)
+        if self.USE_CUDA:
+            batch_input_var=batch_input_var.cuda()
+            batch_output_var=batch_output_var.cuda()
         return batch_input_var,batch_output_var
 
 

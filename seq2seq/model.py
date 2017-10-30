@@ -1,12 +1,7 @@
-import random
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
-
-from config import USE_CUDA
-
 
 
 
@@ -18,6 +13,7 @@ class EncoderRNN(nn.Module):
         self.input_dim = config.input_dim
         self.hidden_dim = config.hidden_dim
         self.n_layers = config.n_input_layers
+        self.USE_CUDA=config.USE_CUDA
 
         self.embedding = nn.Embedding(self.n_dict, self.input_dim)
         self.gru = nn.GRU(self.input_dim, self.hidden_dim, self.n_layers)
@@ -31,13 +27,13 @@ class EncoderRNN(nn.Module):
 
     def init_hidden(self):
         hidden = Variable(torch.zeros(self.n_layers, 1, self.hidden_dim))
-        if USE_CUDA: hidden = hidden.cuda()
+        if self.USE_CUDA: hidden = hidden.cuda()
         return hidden
 
 class Attn(nn.Module):
     def __init__(self,config):
         super(Attn, self).__init__()
-
+        self.USE_CUDA=config.USE_CUDA
         self.method = config.attn_model
         self.hidden_dim = config.hidden_dim
         self.max_length=config.max_length
@@ -53,7 +49,7 @@ class Attn(nn.Module):
 
         # Create variable to store attention energies
         attn_energies = Variable(torch.zeros(seq_len))  # B x 1 x S
-        if USE_CUDA: attn_energies = attn_energies.cuda()
+        if self.USE_CUDA: attn_energies = attn_energies.cuda()
 
         # Calculate energies for each encoder output
         for i in range(seq_len):

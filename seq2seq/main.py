@@ -1,12 +1,12 @@
 import argparse
 
-from config import DemoConfig,ReleaseConfig,SOS_token,EOS_token
-from dataprocessor import Dataset
-from model import EncoderRNN,AttnDecoderRNN
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
 from pylab import *
+from torch.autograd import Variable
+
+from config import DemoConfig,ReleaseConfig
+from model import EncoderRNN,AttnDecoderRNN
 
 class Train(object):
 
@@ -16,25 +16,29 @@ class Train(object):
     #TODO : need to change, with no dataset in the train class, a apply method should be
     #TODO : in this class, which accept a dataset parameters and train the dataset .
 
-    def __init__(self,config):
+    def __init__(self,config,dataset):
+        self.config=config
         self.n_epochs=config.n_epochs
-        self.dataset=Dataset(config=config)
-        self.encoder=EncoderRNN(n_dict=self.dataset.source.n_words,config=config)
-        self.decoder=AttnDecoderRNN(n_dict=self.dataset.target.n_words,config=config)
+        self.encoder=EncoderRNN(n_dict=dataset.source.n_words,config=config)
+        self.decoder=AttnDecoderRNN(n_dict=dataset.target.n_words,config=config)
         self.encoder_optimizer=config.optimizier(self.encoder.parameters(),lr=config.learning_rate)
         self.decoder_optimizer=config.optimizier(self.decoder.parameters(),lr=config.learning_rate)
         self.criterion = nn.NLLLoss()
         self.is_plot=config.is_plot
         self.clip_value=config.clip_value
         self.losses = []
-
-    def train(self):
+        if self.config.USE_CUDA:
+            self.encoder=self.encoder.cuda()
+        if self.config.USE_CUDA:
+            self.decoder=self.decoder.cuda()
+    def train(self,dataset):
         if self.is_plot:
             fig, ax = plt.subplots()
             grid(True)
             plt.ion()
         for epoch in range(self.n_epochs):
-            loss=self.step()
+            training_pair=dataset.get_sample_var()
+            loss=self.step(training_pair)
             print("At Epoch : {:5},Get loss : {:10}\n".format(epoch,loss))
             self.losses.append(loss)
             if self.is_plot:
@@ -42,10 +46,10 @@ class Train(object):
                 plt.pause(0.0001)
                 plt.show()
 
-    def step(self):
+    def step(self,training_pair):
         self.encoder_optimizer.zero_grad()
         self.decoder_optimizer.zero_grad()
-        training_pair=self.dataset.get_sample_var()
+
         input_variable = training_pair[0]
         target_variable = training_pair[1]
 
@@ -55,7 +59,7 @@ class Train(object):
 
         encoder_hidden=self.encoder.init_hidden()
         encoder_outputs,encoder_hidden=self.encoder(input_variable,encoder_hidden)
-        decoder_input=Variable(torch.LongTensor([[SOS_token]]))
+        decoder_input=Variable(torch.LongTensor([[self.config.SOS_token]]))
         decoder_context = Variable(torch.zeros(1, self.decoder.hidden_dim))
         decoder_hidden = encoder_hidden
 
@@ -71,7 +75,9 @@ class Train(object):
             topv, topi = decoder_output.data.topk(1)
             ni = topi[0][0]
             decoder_input = Variable(torch.LongTensor([[ni]]))
-            if ni == EOS_token: break
+            if self.config.USE_CUDA:
+                decoder_input=decoder_input.cuda()
+            if ni == self.config.EOS_token: break
         loss.backward()
         # TODO : clip value
         torch.nn.utils.clip_grad_norm(self.encoder.parameters(), self.clip_value)
@@ -80,7 +86,8 @@ class Train(object):
 
         self.encoder_optimizer.step()
         self.decoder_optimizer.step()
-
+        if self.config.USE_CUDA:
+            return loss.cpu().data[0]/target_length
         return loss.data[0] / target_length
 
 

@@ -1,14 +1,15 @@
 #-*- coding: UTF-8 -*-
 
 from __future__ import print_function
-import jieba
-import nltk
+
 import codecs
+import logging
 import re
 import unicodedata
-import os
 
-import logging
+import jieba
+import nltk
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
