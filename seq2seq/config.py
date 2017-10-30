@@ -34,10 +34,12 @@ class Config(object):
                  n_output_layers=1,
                  attn_model='dot',
                  dropout_p=0.1,
+                 clip_value=5.0,
                  max_length=10,
                  optimizer='adam',
                  learning_rate=0.0001,
-                 mode='demo'):
+                 mode='demo',
+                 is_plot=False):
         """
         :param batchsize:
         :param n_epochs:
@@ -56,6 +58,8 @@ class Config(object):
         self.max_length=max_length
         self.optimizier=optimizier_dict[optimizer]
         self.learning_rate=learning_rate
+        self.is_plot = is_plot
+        self.clip_value=clip_value
         if self.mode not in MODE:
             raise Exception("{} is not correct".format(self.mode))
         if self.mode==MODE[0]:
