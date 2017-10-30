@@ -1,7 +1,8 @@
 data/*
 seq2seq/*.pyc
-seq2seq/model/*.pyc
+seq2seq/model/*.
 seq2seq/*.ipynb
+seq2seq/*.ipynb_checkpoints
 nohub.out
 .idea/*
 .DS_Store
