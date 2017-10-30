@@ -94,6 +94,8 @@ def main():
         Myconfig=ReleaseConfig
     elif args.mode=='demo':
         Myconfig=DemoConfig
+    if args.plot:
+        Myconfig.is_plot=True
     experiment=Train(config=Myconfig)
     experiment.train()
 
