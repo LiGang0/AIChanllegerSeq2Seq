@@ -23,8 +23,8 @@ class Config(object):
                  batch_size,
                  n_epochs,
                  hidden_dim,
-                 input_dim=10000,
-                 output_dim=10000,
+                 input_dim=1000,
+                 output_dim=1000,
                  n_input_layers=1,
                  n_output_layers=1,
                  attn_model='dot',
@@ -73,9 +73,9 @@ class Config(object):
         return result
 
 
-DemoConfig    = Config(batch_size=10,n_epochs=1000,hidden_dim=1000)
+DemoConfig    = Config(batch_size=10,n_epochs=1000,hidden_dim=100)
 
-ReleaseConfig = Config(batch_size=10,n_epochs=1000,hidden_dim=1000,mode='release')
+ReleaseConfig = Config(batch_size=10,n_epochs=1000,hidden_dim=100,mode='release')
 
 if __name__ == '__main__':
     pass

@@ -65,6 +65,8 @@ class Train(object):
         if self.config.USE_CUDA:
             decoder_input=decoder_input.cuda()
             decoder_context=decoder_context.cuda()
+            assert type(decoder_input.data)==torch.cuda.LongTensor
+            assert type(decoder_context.data)==torch.cuda.FloatTensor
 
         for di in range(target_length):
             decoder_output, \
