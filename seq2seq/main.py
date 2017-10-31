@@ -28,9 +28,9 @@ class Train(object):
         self.clip_value=config.clip_value
         self.losses = []
         if self.config.USE_CUDA:
-            self.encoder=self.encoder.cuda()
+            self.encoder.cuda()
         if self.config.USE_CUDA:
-            self.decoder=self.decoder.cuda()
+            self.decoder.cuda()
     def train(self,dataset):
         if self.is_plot:
             fig, ax = plt.subplots()

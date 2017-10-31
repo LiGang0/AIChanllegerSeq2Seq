@@ -7,3 +7,5 @@ nohub.out
 .idea/*
 .DS_Store
 examples/.ipynb_checkpoints/*
+./Prepare/*
+
