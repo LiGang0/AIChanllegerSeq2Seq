@@ -80,6 +80,9 @@ class Dataset(torch.utils.data.Dataset):
         [input_index,output_index]=index_sample
         input_var=Variable(torch.LongTensor(input_index).view(-1,1))
         output_var=Variable(torch.LongTensor(output_index).view(-1,1))
+        if self.USE_CUDA:
+            input_var=input_var.cuda()
+            output_var=output_var.cuda()
         return [input_var,output_var]
     def get_batch(self,batchsize):
         #TODO:

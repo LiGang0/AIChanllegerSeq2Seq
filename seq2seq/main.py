@@ -7,7 +7,7 @@ from torch.autograd import Variable
 
 from config import DemoConfig,ReleaseConfig
 from model import EncoderRNN,AttnDecoderRNN
-
+from dataprocessor import Dataset
 class Train(object):
 
     """
@@ -62,6 +62,9 @@ class Train(object):
         decoder_input=Variable(torch.LongTensor([[self.config.SOS_token]]))
         decoder_context = Variable(torch.zeros(1, self.decoder.hidden_dim))
         decoder_hidden = encoder_hidden
+        if self.config.USE_CUDA:
+            decoder_input=decoder_input.cuda()
+            decoder_context=decoder_context.cuda()
 
         for di in range(target_length):
             decoder_output, \
@@ -103,8 +106,10 @@ def main():
         Myconfig=DemoConfig
     if args.plot:
         Myconfig.is_plot=True
-    experiment=Train(config=Myconfig)
-    experiment.train()
+    dataset=Dataset(config=Myconfig)
+
+    experiment=Train(config=Myconfig,dataset=dataset)
+    experiment.train(dataset)
 
 
 
