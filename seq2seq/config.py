@@ -73,9 +73,9 @@ class Config(object):
         return result
 
 
-DemoConfig    = Config(batch_size=10,n_epochs=1000,hidden_dim=100)
+DemoConfig    = Config(batch_size=10,n_epochs=100000,hidden_dim=100)
 
-ReleaseConfig = Config(batch_size=10,n_epochs=1000,hidden_dim=100,mode='release')
+ReleaseConfig = Config(batch_size=10,n_epochs=10000000,hidden_dim=100,mode='release')
 
 if __name__ == '__main__':
     pass
