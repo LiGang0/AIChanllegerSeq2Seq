@@ -10,6 +10,7 @@ data_path=os.path.abspath(os.path.join(root_path,"data"))
 demo_path=os.path.abspath(os.path.join(data_path,"demo"))
 
 MODE=['release','demo']
+gpu_ids=[0,1]
 optimizier_dict={
     'adam'   : torch.optim.Adam,
     'sgd'    : torch.optim.SGD,
@@ -34,7 +35,8 @@ class Config(object):
                  optimizer='adam',
                  learning_rate=0.0001,
                  mode='demo',
-                 is_plot=False):
+                 is_plot=False,
+                gpu_id=0):
         """
         :param batchsize:
         :param n_epochs:
@@ -58,6 +60,9 @@ class Config(object):
         self.is_plot = is_plot
         self.clip_value=clip_value
         self.USE_CUDA=torch.cuda.is_available()
+        if gpu_id not in gpu_ids:
+            raise Exception("{} is not correct".format(gpu_id))
+        self.gpu_id=gpu_id
         if self.mode not in MODE:
             raise Exception("{} is not correct".format(self.mode))
         if self.mode==MODE[0]:

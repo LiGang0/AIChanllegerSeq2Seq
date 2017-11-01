@@ -28,9 +28,9 @@ class Train(object):
         self.clip_value=config.clip_value
         self.losses = []
         if self.config.USE_CUDA:
-            self.encoder.cuda()
+            self.encoder.cuda(self.config.gpu_id)
         if self.config.USE_CUDA:
-            self.decoder.cuda()
+            self.decoder.cuda(device_id=self.config.gpu_id)
     def train(self,dataset):
         if self.is_plot:
             fig, ax = plt.subplots()
@@ -38,13 +38,16 @@ class Train(object):
             plt.ion()
         for epoch in range(self.n_epochs):
             training_pair=dataset.get_sample_var()
-            loss=self.step(training_pair)
+            loss,result_output=self.step(training_pair)
             print("At Epoch : {:5},Get loss : {:10}\n".format(epoch,loss))
             self.losses.append(loss)
             if self.is_plot:
                 ax.plot(range(epoch+1),self.losses,"b")
                 plt.pause(0.0001)
                 plt.show()
+            if epoch%100==0:
+                print ''.join([dataset.target.index2word[i] for i in training_pair[1].squeeze(1).data.tolist()])
+                print ''.join([dataset.target.index2word[i] for i in result_output])
 
     def step(self,training_pair):
         self.encoder_optimizer.zero_grad()
@@ -63,11 +66,11 @@ class Train(object):
         decoder_context = Variable(torch.zeros(1, self.decoder.hidden_dim))
         decoder_hidden = encoder_hidden
         if self.config.USE_CUDA:
-            decoder_input=decoder_input.cuda()
-            decoder_context=decoder_context.cuda()
+            decoder_input=decoder_input.cuda(device_id=self.config.gpu_id)
+            decoder_context=decoder_context.cuda(device_id=self.config.gpu_id)
             assert type(decoder_input.data)==torch.cuda.LongTensor
             assert type(decoder_context.data)==torch.cuda.FloatTensor
-
+        result_output=[]
         for di in range(target_length):
             decoder_output, \
             decoder_context, \
@@ -81,7 +84,8 @@ class Train(object):
             ni = topi[0][0]
             decoder_input = Variable(torch.LongTensor([[ni]]))
             if self.config.USE_CUDA:
-                decoder_input=decoder_input.cuda()
+                decoder_input=decoder_input.cuda(device_id=self.config.gpu_id)
+            result_output.append(ni)
             if ni == self.config.EOS_token: break
         loss.backward()
         # TODO : clip value
@@ -92,14 +96,15 @@ class Train(object):
         self.encoder_optimizer.step()
         self.decoder_optimizer.step()
         if self.config.USE_CUDA:
-            return loss.cpu().data[0]/target_length
-        return loss.data[0] / target_length
+            return loss.cpu().data[0]/target_length,result_output
+        return loss.data[0]/target_length,result_output
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-m","--mode",help= "Chose a mode",default="demo")
     parser.add_argument("-p","--plot",help="Is plot?",default=False)
+    parser.add_argument("-g","--gpu_id",help="choose 1 or 0",default=0)
     args=parser.parse_args()
 
     if args.mode=='release':
@@ -108,6 +113,8 @@ def main():
         Myconfig=DemoConfig
     if args.plot:
         Myconfig.is_plot=True
+    Myconfig.gpu_id=int(args.gpu_id)
+    print Myconfig
     dataset=Dataset(config=Myconfig)
 
     experiment=Train(config=Myconfig,dataset=dataset)

@@ -81,8 +81,8 @@ class Dataset(torch.utils.data.Dataset):
         input_var=Variable(torch.LongTensor(input_index).view(-1,1))
         output_var=Variable(torch.LongTensor(output_index).view(-1,1))
         if self.USE_CUDA:
-            input_var=input_var.cuda()
-            output_var=output_var.cuda()
+            input_var=input_var.cuda(device_id=self.config.gpu_id)
+            output_var=output_var.cuda(device_id=self.config.gpu_id)
         return [input_var,output_var]
     def get_batch(self,batchsize):
         #TODO:
@@ -92,8 +92,8 @@ class Dataset(torch.utils.data.Dataset):
             batch_input_var.append(self.get_index_sample)
             batch_output_var.append(self.get_index_sample)
         if self.USE_CUDA:
-            batch_input_var=batch_input_var.cuda()
-            batch_output_var=batch_output_var.cuda()
+            batch_input_var=batch_input_var.cuda(device_id=self.config.gpu_id)
+            batch_output_var=batch_output_var.cuda(device_id=self.config.gpu_id)
         return batch_input_var,batch_output_var
 
 
