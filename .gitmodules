@@ -1,0 +1,3 @@
+[submodule "AI_Challenger"]
+	path = AI_Challenger
+	url = https://github.com/mingzailao/AI_Challenger.git
