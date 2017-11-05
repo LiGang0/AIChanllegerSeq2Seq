@@ -49,7 +49,7 @@ class TrainWord2vec(object):
 
 
     def step(self,training_index):
-        souce_sentence=training_index[self.mode]
+        source_sentence=training_index[self.mode]
         if not self.config.USE_CUDA:
             trigrams_var =[(torch.autograd.Variable(torch.LongTensor(
                 [source_sentence[i],source_sentence[i + 1]])),
